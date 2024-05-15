@@ -1,0 +1,10 @@
+12:20:08 **** Incremental Build of configuration Debug for project anothertest ****
+make -j8 all 
+arm-none-eabi-size  anothertest.elf 
+   text	   data	    bss	    dec	    hex	filename
+   1924	     20	   1572	   3516	    dbc	anothertest.elf
+Finished building: default.size.stdout
+ 
+
+12:20:09 Build Finished. 0 errors, 0 warnings. (took 210ms)
+

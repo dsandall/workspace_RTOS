@@ -1,0 +1,31 @@
+20:47:36 **** Build of configuration Debug for project CursesTest ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L476xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'MSI_Overclock':
+../Core/Src/main.c:45:17: warning: unused variable 'MSIRANGE_4Mhz' [-Wunused-variable]
+   45 |         uint8_t MSIRANGE_4Mhz =0b0110;
+      |                 ^~~~~~~~~~~~~
+../Core/Src/main.c:44:17: warning: unused variable 'MSIRANGE_400khz' [-Wunused-variable]
+   44 |         uint8_t MSIRANGE_400khz =0b0010;
+      |                 ^~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:86:16: warning: variable 'z' set but not used [-Wunused-but-set-variable]
+   86 |         int i, z;
+      |                ^
+../Core/Src/main.c:86:13: warning: variable 'i' set but not used [-Wunused-but-set-variable]
+   86 |         int i, z;
+      |             ^
+arm-none-eabi-gcc -o "CursesTest.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\thebu\STM32CubeIDE\workspace_RTOS\CursesTest\STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="CursesTest.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: CursesTest.elf
+ 
+arm-none-eabi-size  CursesTest.elf 
+arm-none-eabi-objdump -h -S CursesTest.elf  > "CursesTest.list"
+   text	   data	    bss	    dec	    hex	filename
+   5944	     20	   1572	   7536	   1d70	CursesTest.elf
+Finished building: default.size.stdout
+ 
+Finished building: CursesTest.list
+ 
+
+20:47:39 Build Finished. 0 errors, 4 warnings. (took 2s.591ms)
+

@@ -1,0 +1,5 @@
+../Core/Src/DMA.c:11:6:DMA_registers	4	static
+../Core/Src/DMA.c:32:6:DMA1C1_32bM2M_init	24	static
+../Core/Src/DMA.c:55:6:DMA1C3_16bADC2M_init	16	static
+../Core/Src/DMA.c:80:6:ADC_registers	4	static
+../Core/Src/DMA.c:86:6:ADC_init_wDMA	24	static,ignoring_inline_asm

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;A7_spirit1_library/Core/Inc/addressList&apos; to &apos;addressList.h&apos;" description="Rename resource &apos;addressList&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="Core/Inc/addressList" name="addressList.h" stamp="1715739067383" updateReferences="true"/>
+</session>

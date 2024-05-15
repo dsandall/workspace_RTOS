@@ -1,0 +1,5 @@
+../Drivers/CMSIS/Include/core_cm4.h:2059:26:ITM_SendChar	16	static,ignoring_inline_asm
+../Core/Src/general.c:11:6:PortC_Init	4	static
+../Core/Src/general.c:38:6:PortA_init	4	static
+../Core/Src/general.c:48:6:MSI_Overclock	16	static
+../Core/Src/general.c:79:5:_write	32	static

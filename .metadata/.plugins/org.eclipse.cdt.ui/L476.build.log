@@ -1,0 +1,36 @@
+18:02:47 **** Incremental Build of configuration Debug for project L476 ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L476xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:44:3: warning: implicit declaration of function 'TimerSetup' [-Wimplicit-function-declaration]
+   44 |   TimerSetup();
+      |   ^~~~~~~~~~
+../Core/Src/main.c: In function 'USART2_IRQHandler':
+../Core/Src/main.c:139:45: warning: format '%X' expects argument of type 'unsigned int', but argument 3 has type 'uint32_t' {aka 'long unsigned int'} [-Wformat=]
+  139 |                         sprintf(buffer, "0x%X\n", userNumberMS);
+      |                                            ~^     ~~~~~~~~~~~~
+      |                                             |     |
+      |                                             |     uint32_t {aka long unsigned int}
+      |                                             unsigned int
+      |                                            %lX
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:161:6: warning: conflicting types for 'TimerSetup'; have 'void(void)'
+  161 | void TimerSetup(void){
+      |      ^~~~~~~~~~
+../Core/Src/main.c:44:3: note: previous implicit declaration of 'TimerSetup' with type 'void(void)'
+   44 |   TimerSetup();
+      |   ^~~~~~~~~~
+arm-none-eabi-gcc -o "L476.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\thebu\STM32CubeIDE\workspace_RTOS\L476\STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="L476.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: L476.elf
+ 
+arm-none-eabi-size  L476.elf 
+arm-none-eabi-objdump -h -S L476.elf  > "L476.list"
+   text	   data	    bss	    dec	    hex	filename
+   5252	    108	   1948	   7308	   1c8c	L476.elf
+Finished building: default.size.stdout
+ 
+Finished building: L476.list
+ 
+
+18:02:48 Build Finished. 0 errors, 3 warnings. (took 758ms)
+

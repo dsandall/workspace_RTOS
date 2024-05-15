@@ -1,0 +1,129 @@
+#include "main.h"
+void SystemClock_Config(void);
+
+//4Mhz/5khz = 800;
+//4Mhz = .00025 milliseconds
+const int prescale = 0;
+const int autoreload = 800;
+
+void TimerSetup(void){
+//  TIMER ESSENTIALS
+	RCC->APB1ENR1 |= RCC_APB1ENR1_TIM2EN; //Enable Clock input to TIM2
+	TIM2->PSC = prescale; // Set prescaler value
+	TIM2->ARR = autoreload-1;   // Set auto-reload value
+	TIM2->CR1 |= TIM_CR1_CEN; // Enable TIM2 in config register 1
+	TIM2->CR1 &= ~(TIM_CR1_DIR);  // Clear DIR bit to set upcount mode (not super essential, cuz it defaults here)
+
+	//// 	Enable TIM2 interrupt in NVIC (THE interrupter for STM32)
+	NVIC->ISER[TIM2_IRQn / 32] = (1 << (TIM2_IRQn % 32));
+
+	TIM2->DIER |= 6; // enable interrupt generation for CC channels 1 and 2
+	TIM2->CCR1 = (autoreload/4)-1; //interrupt at 25%
+	TIM2->CCR2 = 0; // interrupt at 0% (this could also just be the overrun flag, but eh)
+}
+
+void TIM2_IRQHandler(void) {
+	if(TIM2->SR & TIM_SR_CC1IF){
+		TIM2->SR &= ~TIM_SR_CC1IF; //clear flag
+		GPIOB->ODR &= ~(1 << 7);//set low
+	}
+
+	if (TIM2->SR & TIM_SR_CC2IF){
+		TIM2->SR &= ~TIM_SR_CC2IF; //clear flag
+		GPIOB->ODR |= (1 << 7);//set high
+	}
+}
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
+int main(void)
+{
+  HAL_Init();
+
+  // Enable MCO, select MSI (4 MHz source)
+  RCC->CFGR = ((RCC->CFGR & ~(RCC_CFGR_MCOSEL)) | (RCC_CFGR_MCOSEL_0));
+
+  // Enable GPIOB clock
+  RCC->AHB2ENR |= RCC_AHB2ENR_GPIOBEN;
+
+  // Set PB7 as output
+  GPIOB->MODER &= ~(0x3 << 7*2);
+  GPIOB->MODER |= (0x1 << 7*2);
+
+  TimerSetup();
+
+  while (1){
+  //celebrate!
+  }
+
+}
+
+void SystemClock_Config(void)
+{
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+
+  /** Configure the main internal regulator output voltage
+  */
+  if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.MSIState = RCC_MSI_ON;
+  RCC_OscInitStruct.MSICalibrationValue = 0;
+  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Initializes the CPU, AHB and APB buses clocks
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_MSI;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+void Error_Handler(void)
+{
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
+  __disable_irq();
+  while (1)
+  {
+  }
+  /* USER CODE END Error_Handler_Debug */
+}
+
+#ifdef  USE_FULL_ASSERT
+/**
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
+void assert_failed(uint8_t *file, uint32_t line)
+{
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
+}
+#endif /* USE_FULL_ASSERT */

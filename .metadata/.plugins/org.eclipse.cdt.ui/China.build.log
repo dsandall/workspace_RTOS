@@ -1,0 +1,19 @@
+20:08:03 **** Incremental Build of configuration Debug for project China ****
+make -j8 all 
+arm-none-eabi-gcc -o "China.elf" @"objects.list"   -mcpu=cortex-m3 -T"C:\Users\thebu\STM32CubeIDE\workspace_RTOS\China\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="China.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: China.elf
+ 
+arm-none-eabi-size  China.elf 
+arm-none-eabi-objdump -h -S China.elf  > "China.list"
+arm-none-eabi-objcopy  -O binary China.elf  "China.bin"
+   text	   data	    bss	    dec	    hex	filename
+   4672	     20	   1572	   6264	   1878	China.elf
+Finished building: default.size.stdout
+ 
+Finished building: China.list
+ 
+Finished building: China.bin
+ 
+
+20:08:04 Build Finished. 0 errors, 0 warnings. (took 723ms)
+

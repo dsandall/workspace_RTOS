@@ -1,0 +1,9 @@
+../Core/Src/main.c:22:5:main	2
+../Core/Src/main.c:88:6:TaskInit	1
+../Core/Src/main.c:92:6:TaskCount	1
+../Core/Src/main.c:96:6:init_IWDG	1
+../Core/Src/main.c:100:6:init_EXTI	1
+../Core/Src/main.c:115:6:EXTI15_10_IRQHandler	2
+../Core/Src/main.c:185:6:SystemClock_Config	4
+../Core/Src/main.c:242:6:StartDefaultTask	1
+../Core/Src/main.c:278:6:Error_Handler	1

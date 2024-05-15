@@ -1,0 +1,64 @@
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
+#define F_CLK 4000000 	// bus clock is 4 MHz
+
+
+/* Private function prototypes -----------------------------------------------*/
+void USART_Print(const char* message);
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
+int main(void)
+{
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
+
+  // configure GPIO pins for USART2 (PA2, PA3) follow order of configuring registers
+  // AFR, OTYPER, PUPDR, OSPEEDR, MODDER otherwise a glitch is created on the output pin
+  RCC->AHB2ENR |= (RCC_AHB2ENR_GPIOGEN);
+  GPIOG->AFR[0] &= ~(GPIO_AFRL_AFSEL7);		// mask AF selection
+  GPIOG->AFR[0] |= (7 << GPIO_AFRL_AFSEL7_Pos); 		  	  	// for PA2 and PA3
+
+  GPIOG->AFR[1] &= ~(GPIO_AFRL_AFSEL7 | GPIO_AFRL_AFSEL8);		// mask AF selection
+  GPIOG->AFR[1] |= ((7 << GPIO_AFRL_AFSEL8_Pos ) |				// select USART2 (AF7)
+  		  	  	   (7 << GPIO_AFRL_AFSEL7_Pos)); 		  	  	// for PA2 and PA3
+  GPIOG->OTYPER &= ~(GPIO_OTYPER_OT8 | GPIO_OTYPER_OT7);		// push-pull output for PA2, PA3
+  GPIOG->PUPDR &= ~(GPIO_PUPDR_PUPD7 | GPIO_PUPDR_PUPD8);		// no pull ups on PA2, PA3
+  GPIOG->OSPEEDR &= ~(GPIO_OSPEEDR_OSPEED7 | GPIO_OSPEEDR_OSPEED8);	// low speed
+  GPIOG->MODER &= ~(GPIO_MODER_MODE7 | GPIO_MODER_MODE8);		// enable alternate function
+  GPIOG->MODER |= (GPIO_MODER_MODE7_1 | GPIO_MODER_MODE8_1);    // for PA2 and PA3
+
+  // Configure USART2 connected to the debugger virtual COM port
+  RCC->APB1ENR2 |= RCC_APB1ENR2_LPUART1EN;			// enable USART by turning on system clock
+  LPUART1->CR1 &= ~(USART_CR1_M1 | USART_CR1_M0);	//set data to 8 bits
+  LPUART1->BRR = F_CLK / 115200;						// baudrate for 115200
+  LPUART1->CR1 |= USART_CR1_UE;						// enable USART
+  LPUART1->CR1 |= (USART_CR1_TE | USART_CR1_RE);		// enable transmit and receive for USART
+
+  // enable interrupts for USART2 receive
+  LPUART1->CR1 |= USART_CR1_RXNEIE;					// enable RXNE interrupt on USART2
+  LPUART1->ISR &= ~(USART_ISR_RXNE);					// clear interrupt flagwhile (message[i] != 0)
+
+  NVIC->ISER[1] = (1 << (USART2_IRQn & 0x1F));		// enable USART2 ISR
+  __enable_irq();
+
+  USART_Print("Hello World:\r\n");
+  while (1);
+}
+
+void USART_Print(const char* message) {
+	uint8_t i;
+	for(i=0; message[i] != 0; i++){				// check for terminating NULL character
+		while(!(USART2->ISR & USART_ISR_TXE));	// wait for transmit buffer to be empty
+		USART2->TDR = message[i];				// transmit character to USART
+	}
+}
+
+void USART2_IRQHandler(void){
+	if (USART2->ISR & USART_ISR_RXNE){
+		USART2->TDR = USART2->RDR;			// copy received char to transmit buffer to echo
+		USART2->ISR &= ~(USART_ISR_RXNE);	// clear the flag
+	}
+}

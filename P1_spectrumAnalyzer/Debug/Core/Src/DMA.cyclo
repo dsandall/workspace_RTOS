@@ -1,0 +1,6 @@
+../Core/Src/DMA.c:10:6:DMA_registers	1
+../Core/Src/DMA.c:31:6:DMA1C1_32bM2M_init	1
+../Core/Src/DMA.c:54:6:DMA1C3_16bADC2M_init	1
+../Core/Src/DMA.c:80:6:ADC3_IRQHandler	4
+../Core/Src/DMA.c:115:6:ADC_registers	1
+../Core/Src/DMA.c:121:6:ADC_init_wDMA	4

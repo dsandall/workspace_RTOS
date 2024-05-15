@@ -1,0 +1,3 @@
+../Core/Src/timer.c:32:6:TimerSetup	4	static
+../Core/Src/timer.c:67:6:AnotherTimerSetup	4	static
+../Core/Src/timer.c:102:6:test_init_pinA5onboardLED	4	static

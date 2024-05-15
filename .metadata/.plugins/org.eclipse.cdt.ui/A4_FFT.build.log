@@ -1,0 +1,35 @@
+14:17:50 **** Incremental Build of configuration Debug for project A4_FFT ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DARM_MATH_CM4 -DUSE_HAL_DRIVER -DSTM32L476xx -c -I../Core/Inc -I../Drivers/CMSIS/DSP/Include -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'doFFT':
+../Core/Src/main.c:22:13: warning: unused variable 'bitRevFlag' [-Wunused-variable]
+   22 |         int bitRevFlag = 1; //1 for no reverse
+      |             ^~~~~~~~~~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:156:25: warning: implicit declaration of function 'drawBar' [-Wimplicit-function-declaration]
+  156 |                         drawBar(i, z++);
+      |                         ^~~~~~~
+../Core/Src/main.c:134:25: warning: variable 'maxFreq' set but not used [-Wunused-but-set-variable]
+  134 |                 int32_t maxFreq = 0;
+      |                         ^~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:188:6: warning: conflicting types for 'drawBar'; have 'void(int,  uint16_t)' {aka 'void(int,  short unsigned int)'}
+  188 | void drawBar(int xpos, uint16_t barHeight){
+      |      ^~~~~~~
+../Core/Src/main.c:156:25: note: previous implicit declaration of 'drawBar' with type 'void(int,  uint16_t)' {aka 'void(int,  short unsigned int)'}
+  156 |                         drawBar(i, z++);
+      |                         ^~~~~~~
+arm-none-eabi-gcc -o "A4_FFT.elf" @"objects.list"  -larm_cortexM4lf_math -mcpu=cortex-m4 -T"C:\Users\thebu\STM32CubeIDE\workspace_RTOS\A4_FFT\STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="A4_FFT.map" -Wl,--gc-sections -static -L"C:\Users\thebu\STM32CubeIDE\workspace_RTOS\A4_FFT\Drivers\CMSIS\Lib\GCC" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -u _scanf_float -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: A4_FFT.elf
+ 
+arm-none-eabi-size  A4_FFT.elf 
+arm-none-eabi-objdump -h -S A4_FFT.elf  > "A4_FFT.list"
+   text	   data	    bss	    dec	    hex	filename
+ 109772	    476	   2932	 113180	  1ba1c	A4_FFT.elf
+Finished building: default.size.stdout
+ 
+Finished building: A4_FFT.list
+ 
+
+14:17:52 Build Finished. 0 errors, 4 warnings. (took 1s.353ms)
+

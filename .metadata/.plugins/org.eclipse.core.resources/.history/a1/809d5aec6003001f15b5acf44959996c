@@ -1,0 +1,127 @@
+#include <stdlib.h>
+#include "main.h"
+#include "DMA.h"
+#include "timer.h"
+#include "general.h"
+
+#include "arm_math.h"
+
+void testFFT(void){
+	/* USER CODE BEGIN PV */
+	float32_t FFT_Input_Q15_f[50];
+	float32_t aFFT_Input_Q15[50];
+	/* USER CODE END PV */
+	/* USER CODE BEGIN PD */
+	#define FFT_Length  1024
+	/* USER CODE END PD */
+
+	/* USER CODE BEGIN 1 */
+	arm_float_to_q15((float32_t *)&FFT_Input_Q15_f[0], (q15_t *)&aFFT_Input_Q15[0], FFT_Length*2);
+	/* USER CODE END 1 */
+}
+
+uint8_t DMA_Flag = 0;
+
+void DMA1_Channel3_IRQHandler(){
+
+	if(DMA1->ISR & DMA_ISR_TEIF3){
+		//Transfer Error
+		DMA_Flag = 2;
+		//DMA1->IFCR |= DMA_IFCR_CTEIF3;
+	}
+
+	if(DMA1->ISR & DMA_ISR_TCIF3){
+		//Transfer Complete
+		//DMA1->IFCR |= DMA_IFCR_CTCIF3;
+		GPIOC->ODR ^= (1<<1); //Toggle PC1
+		DMA_Flag = 1;
+	}
+
+	if(DMA1->ISR & DMA_ISR_HTIF3){
+		//Transfer Half Complete
+		//DMA1->IFCR |= DMA_IFCR_CHTIF3;
+		GPIOC->ODR ^= (1<<2); //Toggle PC2
+		DMA_Flag = 3;
+	}
+
+	DMA1->IFCR |= DMA_IFCR_CGIF3; //clear glbl interrupt flag
+
+
+
+}
+
+int main(void)
+{
+
+	HAL_Init();
+	PortC_Init();
+
+
+	uint16_t arraySize = 2048;
+	uint16_t *destMem = (uint16_t*)malloc(arraySize * sizeof(uint16_t));
+	while (destMem == NULL); //loop if malloc failed
+
+	*destMem = 0;
+	for (int i = 0; i <1000; i++){
+		destMem[i] = 0;
+	}
+
+
+	testFFT();
+	TimerSetup();
+
+
+
+
+	DMA1C3_16bADC2M_init(destMem);
+	ADC_init_wDMA();
+	//TODO: track down TIM2 output channel 2, it's not making it to the ADC (perhaps not making it out the timer at all?)
+	//TODO: test fix from timer.c:51, IF NOT: see if TIM2CH2 has a GPIO output mode, bypassing interrupts?
+
+
+
+	//TODO: make ADC trigger on timer (done, i think, should probably verify this)
+	//TODO: finish importing FFT library
+	//TODO: make DMA to 2048 transfers, then FFT on array (
+
+	ADC3->CR |= ADC_CR_ADSTART;
+
+	while (1)
+	{
+	}
+}
+
+
+
+
+/**
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
+void Error_Handler(void)
+{
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
+  __disable_irq();
+  while (1)
+  {
+  }
+  /* USER CODE END Error_Handler_Debug */
+}
+
+#ifdef  USE_FULL_ASSERT
+/**
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
+void assert_failed(uint8_t *file, uint32_t line)
+{
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
+}
+#endif /* USE_FULL_ASSERT */
