@@ -208,7 +208,7 @@ void RadioExitShutdown(void)
 
   /* Delay to allow the circuit POR, about 700 us */
   //for(volatile uint32_t i=0;i<0x1E00;i++);
-  HAL_Delay(1); // 1ms (Note: Table 20 of SPIRIT1 datasheet specifies ~650 us)
+//  HAL_Delay(1); // 1ms (Note: Table 20 of SPIRIT1 datasheet specifies ~650 us)
 }
 
 

@@ -24,7 +24,8 @@ org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:A4_FFT\ Debug/activeLaunchTarge
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:A5_Watchdog\ Debug/activeLaunchMode=debug
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:A5_Watchdog\ Debug/activeLaunchTarget=null\:---
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:A6_HAL\ Debug/activeLaunchMode=run
-org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:A7_spirit1_library\ Debug/activeLaunchMode=run
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:A7_spirit1_library\ Debug/activeLaunchMode=debug
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:A7_spirit1_library\ Debug/activeLaunchTarget=null\:---
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:BlinkyDemo\ Debug/activeLaunchMode=run
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:CursesTest\ Debug/activeLaunchMode=run
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:CursesTest\ Debug/activeLaunchTarget=null\:---

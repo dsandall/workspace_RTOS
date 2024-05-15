@@ -64,7 +64,7 @@ void USART_printf(const char* format, ...) {
 	// Check for potential buffer overflow (optional)
 	if (formatted_length >= sizeof(buffer)) {
 		// Handle buffer overflow (e.g., print error message)
-		printf("first TIMER end value %d\n", TIM5->CNT);
+		printf("first TIMER end value %d\n", (int)TIM5->CNT);
 	} else {
 		// Print the formatted string
 		USART_print(buffer);

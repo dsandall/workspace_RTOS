@@ -34,7 +34,7 @@
 #define POWER_INDEX                 7
 #define POWER_DBM                   11.6
 
-//#define RECEIVE_TIMEOUT             2000.0 // change the value for required timeout period
+#define RECEIVE_TIMEOUT             1.0 // change the value for required timeout period (ms)
 #define RSSI_THRESHOLD              -120  // Default RSSI at reception, more than noise floor
 //#define CSMA_RSSI_THRESHOLD         -90   // Higher RSSI to Transmit. If it's lower, the Channel will be seen as busy.
 

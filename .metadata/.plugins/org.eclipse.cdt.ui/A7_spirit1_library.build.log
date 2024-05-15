@@ -1,26 +1,55 @@
-21:31:34 **** Incremental Build of configuration Debug for project A7_spirit1_library ****
+11:31:28 **** Incremental Build of configuration Debug for project A7_spirit1_library ****
 make -j8 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L476xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -I"C:/Users/thebu/STM32CubeIDE/workspace_RTOS/A7_spirit1_library/Drivers/Drivers/BSP/Components/spirit1/SPIRIT1_Library/Inc" -I"C:/Users/thebu/STM32CubeIDE/workspace_RTOS/A7_spirit1_library/Drivers/Drivers/BSP/Components/spirit1" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc "../Core/Src/spsgrf.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L476xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -I"C:/Users/thebu/STM32CubeIDE/workspace_RTOS/A7_spirit1_library/Drivers/Drivers/BSP/Components/spirit1/SPIRIT1_Library/Inc" -I"C:/Users/thebu/STM32CubeIDE/workspace_RTOS/A7_spirit1_library/Drivers/Drivers/BSP/Components/spirit1" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/spsgrf.d" -MT"Core/Src/spsgrf.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/spsgrf.o"
-../Core/Src/spsgrf.c: In function 'SPSGRF_Init':
-../Core/Src/spsgrf.c:25:25: warning: unused variable 'xBasicAddress' [-Wunused-variable]
-   25 |   PktBasicAddressesInit xBasicAddress;
-      |                         ^~~~~~~~~~~~~
-../Core/Src/spsgrf.c:24:16: warning: unused variable 'xBasicInit' [-Wunused-variable]
-   24 |   PktBasicInit xBasicInit;
-      |                ^~~~~~~~~~
-../Core/Src/main.c: In function 'recieve':
-../Core/Src/main.c:114:36: warning: passing argument 1 of 'SPSGRF_GetRxData' from incompatible pointer type [-Wincompatible-pointer-types]
-  114 |           rxLen = SPSGRF_GetRxData(&payload);
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L476xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -I"C:/Users/thebu/STM32CubeIDE/workspace_RTOS/A7_spirit1_library/Drivers/Drivers/BSP/Components/spirit1/SPIRIT1_Library/Inc" -I"C:/Users/thebu/STM32CubeIDE/workspace_RTOS/A7_spirit1_library/Drivers/Drivers/BSP/Components/spirit1" -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'myHAL_UART_printf':
+../Core/Src/main.c:117:44: warning: pointer targets in passing argument 2 of 'HAL_UART_Transmit' differ in signedness [-Wpointer-sign]
+  117 |                 HAL_UART_Transmit(&huart2, buffer, formatted_length, HAL_MAX_DELAY);
+      |                                            ^~~~~~
+      |                                            |
+      |                                            char *
+In file included from ../Core/Inc/stm32l4xx_hal_conf.h:450,
+                 from ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h:1697:79: note: expected 'const uint8_t *' {aka 'const unsigned char *'} but argument is of type 'char *'
+ 1697 | HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, const uint8_t *pData, uint16_t Size, uint32_t Timeout);
+      |                                                                ~~~~~~~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'myHAL_UART_clear':
+../Core/Src/main.c:125:36: warning: pointer targets in passing argument 2 of 'HAL_UART_Transmit' differ in signedness [-Wpointer-sign]
+  125 |         HAL_UART_Transmit(&huart2, clear, strlen(clear), 100);
+      |                                    ^~~~~
+      |                                    |
+      |                                    char *
+In file included from ../Core/Inc/stm32l4xx_hal_conf.h:450,
+                 from ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h:1697:79: note: expected 'const uint8_t *' {aka 'const unsigned char *'} but argument is of type 'char *'
+ 1697 | HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, const uint8_t *pData, uint16_t Size, uint32_t Timeout);
+      |                                                                ~~~~~~~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'printUsersOnline':
+../Core/Src/main.c:130:34: warning: initialization of 'TickType_t' {aka 'long unsigned int'} from 'TickType_t (*)(void)' {aka 'long unsigned int (*)(void)'} makes integer from pointer without a cast [-Wint-conversion]
+  130 |         TickType_t currentTime = xTaskGetTickCount;
+      |                                  ^~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:159:11: warning: implicit declaration of function 'confirm_TX' [-Wimplicit-function-declaration]
+  159 |           confirm_TX();
+      |           ^~~~~~~~~~
+../Core/Src/main.c:166:11: warning: implicit declaration of function 'get_RX' [-Wimplicit-function-declaration]
+  166 |           get_RX();
+      |           ^~~~~~
+../Core/Src/main.c: In function 'receive':
+../Core/Src/main.c:207:36: warning: passing argument 1 of 'SPSGRF_GetRxData' from incompatible pointer type [-Wincompatible-pointer-types]
+  207 |           rxLen = SPSGRF_GetRxData(&payload);
       |                                    ^~~~~~~~
       |                                    |
       |                                    char (*)[15]
-In file included from ../Core/Src/main.c:28:
+In file included from ../Core/Src/main.c:30:
 ../Core/Inc/spsgrf.h:68:35: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char (*)[15]'
    68 | uint8_t SPSGRF_GetRxData(uint8_t *rxBuff);
       |                          ~~~~~~~~~^~~~~~
-../Core/Src/main.c:119:38: warning: pointer targets in passing argument 2 of 'HAL_UART_Transmit' differ in signedness [-Wpointer-sign]
-  119 |           HAL_UART_Transmit(&huart2, "Received: ", 10, HAL_MAX_DELAY);
+../Core/Src/main.c:210:38: warning: pointer targets in passing argument 2 of 'HAL_UART_Transmit' differ in signedness [-Wpointer-sign]
+  210 |           HAL_UART_Transmit(&huart2, "Received: ", 10, HAL_MAX_DELAY);
       |                                      ^~~~~~~~~~~~
       |                                      |
       |                                      char *
@@ -31,8 +60,8 @@ In file included from ../Core/Inc/stm32l4xx_hal_conf.h:450,
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h:1697:79: note: expected 'const uint8_t *' {aka 'const unsigned char *'} but argument is of type 'char *'
  1697 | HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, const uint8_t *pData, uint16_t Size, uint32_t Timeout);
       |                                                                ~~~~~~~~~~~~~~~^~~~~
-../Core/Src/main.c:120:38: warning: pointer targets in passing argument 2 of 'HAL_UART_Transmit' differ in signedness [-Wpointer-sign]
-  120 |           HAL_UART_Transmit(&huart2, payload, rxLen, HAL_MAX_DELAY);
+../Core/Src/main.c:211:38: warning: pointer targets in passing argument 2 of 'HAL_UART_Transmit' differ in signedness [-Wpointer-sign]
+  211 |           HAL_UART_Transmit(&huart2, payload, rxLen, HAL_MAX_DELAY);
       |                                      ^~~~~~~
       |                                      |
       |                                      char *
@@ -43,27 +72,55 @@ In file included from ../Core/Inc/stm32l4xx_hal_conf.h:450,
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h:1697:79: note: expected 'const uint8_t *' {aka 'const unsigned char *'} but argument is of type 'char *'
  1697 | HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, const uint8_t *pData, uint16_t Size, uint32_t Timeout);
       |                                                                ~~~~~~~~~~~~~~~^~~~~
-../Core/Src/main.c:111:19: warning: variable 'sadd' set but not used [-Wunused-but-set-variable]
-  111 |           uint8_t sadd;
-      |                   ^~~~
-../Core/Src/main.c:99:16: warning: unused variable 'clear' [-Wunused-variable]
-   99 |           char clear[] = "\x1B[2J\x1B[0m"; // clear
-      |                ^~~~~
 ../Core/Src/main.c: In function 'transmit':
-../Core/Src/main.c:131:20: warning: pointer targets in passing argument 1 of 'SPSGRF_StartTx' differ in signedness [-Wpointer-sign]
-  131 |     SPSGRF_StartTx(payload, strlen(payload));
+../Core/Src/main.c:220:20: warning: pointer targets in passing argument 1 of 'SPSGRF_StartTx' differ in signedness [-Wpointer-sign]
+  220 |     SPSGRF_StartTx(payload, strlen(payload));
       |                    ^~~~~~~
       |                    |
       |                    char *
-In file included from ../Core/Src/main.c:28:
+In file included from ../Core/Src/main.c:30:
 ../Core/Inc/spsgrf.h:66:30: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
    66 | void SPSGRF_StartTx(uint8_t *txBuff, uint8_t txLen);
       |                     ~~~~~~~~~^~~~~~
-../Core/Src/main.c:134:32: warning: pointer targets in passing argument 2 of 'HAL_UART_Transmit' differ in signedness [-Wpointer-sign]
-  134 |     HAL_UART_Transmit(&huart2, "Payload Sent\r\n", 14, HAL_MAX_DELAY);
-      |                                ^~~~~~~~~~~~~~~~~~
-      |                                |
-      |                                char *
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:233:6: warning: conflicting types for 'confirm_TX'; have 'void()'
+  233 | void confirm_TX(){
+      |      ^~~~~~~~~~
+../Core/Src/main.c:159:11: note: previous implicit declaration of 'confirm_TX' with type 'void()'
+  159 |           confirm_TX();
+      |           ^~~~~~~~~~
+../Core/Src/main.c: In function 'Task_TX':
+../Core/Src/main.c:242:40: warning: pointer targets in passing argument 1 of 'SPSGRF_StartTx' differ in signedness [-Wpointer-sign]
+  242 |                         SPSGRF_StartTx(payload, strlen(payload));
+      |                                        ^~~~~~~
+      |                                        |
+      |                                        char *
+In file included from ../Core/Src/main.c:30:
+../Core/Inc/spsgrf.h:66:30: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+   66 | void SPSGRF_StartTx(uint8_t *txBuff, uint8_t txLen);
+      |                     ~~~~~~~~~^~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:259:6: warning: conflicting types for 'get_RX'; have 'void()'
+  259 | void get_RX(){
+      |      ^~~~~~
+../Core/Src/main.c:166:11: note: previous implicit declaration of 'get_RX' with type 'void()'
+  166 |           get_RX();
+      |           ^~~~~~
+../Core/Src/main.c: In function 'get_RX':
+../Core/Src/main.c:265:38: warning: passing argument 1 of 'SPSGRF_GetRxData' from incompatible pointer type [-Wincompatible-pointer-types]
+  265 |         int rxLen = SPSGRF_GetRxData(&payload);
+      |                                      ^~~~~~~~
+      |                                      |
+      |                                      char (*)[24]
+In file included from ../Core/Src/main.c:30:
+../Core/Inc/spsgrf.h:68:35: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char (*)[24]'
+   68 | uint8_t SPSGRF_GetRxData(uint8_t *rxBuff);
+      |                          ~~~~~~~~~^~~~~~
+../Core/Src/main.c:268:36: warning: pointer targets in passing argument 2 of 'HAL_UART_Transmit' differ in signedness [-Wpointer-sign]
+  268 |         HAL_UART_Transmit(&huart2, "Received: ", 10, HAL_MAX_DELAY);
+      |                                    ^~~~~~~~~~~~
+      |                                    |
+      |                                    char *
 In file included from ../Core/Inc/stm32l4xx_hal_conf.h:450,
                  from ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:29,
                  from ../Core/Inc/main.h:30,
@@ -71,23 +128,29 @@ In file included from ../Core/Inc/stm32l4xx_hal_conf.h:450,
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h:1697:79: note: expected 'const uint8_t *' {aka 'const unsigned char *'} but argument is of type 'char *'
  1697 | HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, const uint8_t *pData, uint16_t Size, uint32_t Timeout);
       |                                                                ~~~~~~~~~~~~~~~^~~~~
-../Core/Src/main.c:127:14: warning: unused variable 'clear' [-Wunused-variable]
-  127 |         char clear[] = "\x1B[2J\x1B[0m"; // clear
-      |              ^~~~~
-../Core/Src/main.c:126:17: warning: unused variable 'rxLen' [-Wunused-variable]
-  126 |         uint8_t rxLen;
-      |                 ^~~~~
+../Core/Src/main.c:269:36: warning: pointer targets in passing argument 2 of 'HAL_UART_Transmit' differ in signedness [-Wpointer-sign]
+  269 |         HAL_UART_Transmit(&huart2, payload, rxLen, HAL_MAX_DELAY);
+      |                                    ^~~~~~~
+      |                                    |
+      |                                    char *
+In file included from ../Core/Inc/stm32l4xx_hal_conf.h:450,
+                 from ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h:1697:79: note: expected 'const uint8_t *' {aka 'const unsigned char *'} but argument is of type 'char *'
+ 1697 | HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, const uint8_t *pData, uint16_t Size, uint32_t Timeout);
+      |                                                                ~~~~~~~~~~~~~~~^~~~~
 arm-none-eabi-gcc -o "A7_spirit1_library.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\thebu\STM32CubeIDE\workspace_RTOS\A7_spirit1_library\STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="A7_spirit1_library.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: A7_spirit1_library.elf
  
 arm-none-eabi-size  A7_spirit1_library.elf 
 arm-none-eabi-objdump -h -S A7_spirit1_library.elf  > "A7_spirit1_library.list"
    text	   data	    bss	    dec	    hex	filename
-  29848	     28	   1820	  31696	   7bd0	A7_spirit1_library.elf
+  48240	    136	  17008	  65384	   ff68	A7_spirit1_library.elf
 Finished building: default.size.stdout
  
 Finished building: A7_spirit1_library.list
  
 
-21:31:37 Build Finished. 0 errors, 11 warnings. (took 3s.409ms)
+11:31:29 Build Finished. 0 errors, 15 warnings. (took 1s.238ms)
 

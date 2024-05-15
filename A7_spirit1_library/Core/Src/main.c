@@ -23,11 +23,49 @@
 #include "usart.h"
 #include "gpio.h"
 
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "SPIRIT_Config.h" // API code for the expansion board
 #include "spsgrf.h" //init code for the wireless module
+#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
+
+
+
+#include "semphr.h"                     // ARM.FreeRTOS::RTOS:Core
+
+
+/* FREERTOS Tasks, Semaphores, and Variables  ------------------------------------*/
+void Task_TX(void *argument);
+void Task_printUsers(void *argument);
+void Task_RX(void *argument);
+
+
+
+TaskHandle_t Task_TXHandler, Task_printUsersHandler, Task_RXHandler;
+SemaphoreHandle_t FLAG_SPIRIT;
+
+void RTOS_ISR_setPriority(uint32_t IRQn){
+	HAL_NVIC_SetPriorityGrouping(0);
+	uint32_t lowPriority = NVIC_EncodePriority(0, 10, 0);
+	//DMA1_Channel3_IRQn
+	NVIC_SetPriority(IRQn, lowPriority);
+}
+
+
+typedef struct User{
+	char username[20];
+	unsigned int address;
+	long timeLastSeen;
+} User;
+
+
+char myUsername[] = "kwiksckoped";
+
+struct User usersOnline[256];
 
 /* USER CODE END Includes */
 
@@ -62,6 +100,41 @@ void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN 0 */
 
 
+void myHAL_UART_printf(const char* format, ...) {
+	va_list args;
+	va_start(args, format);
+
+	// Allocate temporary buffer for formatted string
+	static char buffer[1024]; // Adjust buffer size as needed
+	int formatted_length = vsnprintf(buffer, sizeof(buffer), format, args);
+
+	// Check for potential buffer overflow (optional)
+	if (formatted_length >= sizeof(buffer)) {
+		// Handle buffer overflow (e.g., print error message)
+		while(1);
+	} else {
+		// Print the formatted string
+		HAL_UART_Transmit(&huart2, buffer, formatted_length, HAL_MAX_DELAY);
+	}
+
+	va_end(args);
+}
+
+void myHAL_UART_clear(){
+	char clear[] = "\x1B[2J\x1B[0m\x1B[H"; // clear
+	HAL_UART_Transmit(&huart2, clear, strlen(clear), 100);
+
+}
+
+void printUsersOnline(){
+	TickType_t currentTime = xTaskGetTickCount;
+	myHAL_UART_printf("Users Online:\r\n");
+	for (int i = 0; i < 256; i++){
+		if (usersOnline[i].address != 0){
+			myHAL_UART_printf("%d seen %d s ago\r\n", usersOnline[i].address, (currentTime - usersOnline[i].timeLastSeen)/1000);
+		}
+	}
+}
 
 
 
@@ -74,33 +147,48 @@ volatile SpiritFlagStatus xRxDoneFlag;
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   SpiritIrqs xIrqStatus;
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
   if (GPIO_Pin != SPIRIT1_GPIO3_Pin){return;}
 
   SpiritIrqGetStatus(&xIrqStatus);
+
+
   if (xIrqStatus.IRQ_TX_DATA_SENT)
   {
-    xTxDoneFlag = S_SET;
+	  confirm_TX();
+	  xSemaphoreGiveFromISR(FLAG_SPIRIT, &xHigherPriorityTaskWoken);
   }
+
   if (xIrqStatus.IRQ_RX_DATA_READY)
   {
-    xRxDoneFlag = S_SET;
+//    xRxDoneFlag = S_SET;
+	  get_RX();
+	  xSemaphoreGiveFromISR(FLAG_SPIRIT, &xHigherPriorityTaskWoken);
   }
-  if (xIrqStatus.IRQ_RX_DATA_DISC || xIrqStatus.IRQ_RX_TIMEOUT)
+
+  if (xIrqStatus.IRQ_RX_DATA_DISC)
   {
     SpiritCmdStrobeRx();
-    SpiritIrqClearStatus();
   }
+
+  if (xIrqStatus.IRQ_RX_TIMEOUT){
+	xSemaphoreGiveFromISR(FLAG_SPIRIT, &xHigherPriorityTaskWoken);
+	SpiritCmdStrobeRx();
+  }
+
+  SpiritIrqClearStatus();
+  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 
-void recieve(){
+void receive(){
 	  char payload[] = "Hello World!\r\n";
 	  uint8_t rxLen;
 
-	  char clear[] = "\x1B[2J\x1B[0m"; // clear
-
-	//	HAL_UART_Transmit(&huart2, clear, 9, 100);
+//	  char clear[] = "\x1B[2J\x1B[0m"; // clear
+//
+//		HAL_UART_Transmit(&huart2, clear, 9, 100);
 	//	HAL_UART_Transmit(&huart2, payload, 20, 100);
 
 	  xRxDoneFlag = S_RESET;
@@ -113,31 +201,81 @@ void recieve(){
 	  uint8_t sadd;
 	  sadd = SpiritPktStackGetReceivedSourceAddress();
 
+	  usersOnline[sadd].timeLastSeen = xTaskGetTickCount();
+	  usersOnline[sadd].address = sadd;
+
 	  rxLen = SPSGRF_GetRxData(&payload);
 
-	//	rxLen = SpiritPktStackGetRecievedSourceAddress(payload);
-
-
+	  myHAL_UART_clear();
 	  HAL_UART_Transmit(&huart2, "Received: ", 10, HAL_MAX_DELAY);
 	  HAL_UART_Transmit(&huart2, payload, rxLen, HAL_MAX_DELAY);
 }
 
 
 void transmit(){
-	char payload[] = "UwU *nuzzles*\r\n";
-	uint8_t rxLen;
-	char clear[] = "\x1B[2J\x1B[0m"; // clear
+	char payload[] = "Beep beep bloop bloop\r\n";
 
 	// Send the payload
     xTxDoneFlag = S_RESET;
     SPSGRF_StartTx(payload, strlen(payload));
     while(!xTxDoneFlag);
 
-    HAL_UART_Transmit(&huart2, "Payload Sent\r\n", 14, HAL_MAX_DELAY);
-
-    HAL_Delay(30000); // Block for 2000 ms
+    myHAL_UART_clear();
+    myHAL_UART_printf("payload sent: %s", payload);
 }
 
+
+
+
+//TX//////////////
+char payload[] = "Beep beep bloop bloop\r\n";
+
+void confirm_TX(){
+    myHAL_UART_clear();
+    myHAL_UART_printf("payload sent: %s", payload);
+}
+
+void Task_TX(void *argument){
+	  while (1)
+	  {
+		  if(xSemaphoreTake(FLAG_SPIRIT, 10) == 1){
+			SPSGRF_StartTx(payload, strlen(payload));
+			vTaskDelay(2000);
+		  }
+	  }
+}
+
+
+//USERS//////////////
+void Task_printUsers(void *argument){
+	while (1){
+	  printUsersOnline();
+	  vTaskDelay(1000);
+
+	}
+}
+
+//RX//////////////
+void get_RX(){
+	uint8_t sadd = SpiritPktStackGetReceivedSourceAddress();
+
+	usersOnline[sadd].timeLastSeen = xTaskGetTickCount();
+	usersOnline[sadd].address = sadd;
+
+	int rxLen = SPSGRF_GetRxData(&payload);
+
+	myHAL_UART_clear();
+	HAL_UART_Transmit(&huart2, "Received: ", 10, HAL_MAX_DELAY);
+	HAL_UART_Transmit(&huart2, payload, rxLen, HAL_MAX_DELAY);
+}
+
+void Task_RX(void *argument){
+	while(1){
+		if(xSemaphoreTake(FLAG_SPIRIT, 10) == 1){
+		  SPSGRF_StartRx();
+		}
+	}
+}
 /* USER CODE END 0 */
 
 /**
@@ -164,39 +302,81 @@ int main(void)
 
   /* USER CODE BEGIN SysInit */
 
+
+
+  RTOS_ISR_setPriority(EXTI9_5_IRQn);
+
+
+  /* Create the tasks */
+  BaseType_t retVal = xTaskCreate(Task_TX, "Task_TX", configMINIMAL_STACK_SIZE,
+  		NULL, tskIDLE_PRIORITY + 4, &Task_TXHandler);
+  if (retVal != 1) { while(1);}	// check if task creation failed
+
+  retVal = xTaskCreate(Task_printUsers, "Task_printUsers", configMINIMAL_STACK_SIZE,
+  		NULL, tskIDLE_PRIORITY + 2, &Task_printUsersHandler);
+  if (retVal != 1) { while(1);}	// check if task creation failed
+
+  retVal = xTaskCreate(Task_RX, "Task_RX", configMINIMAL_STACK_SIZE,
+  		NULL, tskIDLE_PRIORITY + 3, &Task_RXHandler);
+  if (retVal != 1) { while(1);}	// check if task creation failed
+
+
+  // Create Semaphores for task2 and task3
+  FLAG_SPIRIT = xSemaphoreCreateBinary();
+  if (FLAG_SPIRIT == NULL) { while(1); }
+
+
+
+
+
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_SPI1_Init();
   MX_USART2_UART_Init();
+
+
   /* USER CODE BEGIN 2 */
+  myHAL_UART_clear();
+  myHAL_UART_printf("let's goooo");
+
   SPSGRF_Init();
 
   SpiritPktBasicSetDestinationAddress(0xFF);
 
+
+
+  xSemaphoreGive(FLAG_SPIRIT);
+
+
   /* USER CODE END 2 */
 
   /* Init scheduler */
-  osKernelInitialize();
+//  osKernelInitialize();
 
   /* Call init function for freertos objects (in freertos.c) */
-  MX_FREERTOS_Init();
+//  MX_FREERTOS_Init();
 
   /* Start scheduler */
-  osKernelStart();
+//  osKernelStart();
 
   /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  while (1)
-  {
-	  transmit();
+
+//
+//  while (1)
+//  {
+//	  transmit();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  }
+//  }
+
+  vTaskStartScheduler();
+
   /* USER CODE END 3 */
 }
 

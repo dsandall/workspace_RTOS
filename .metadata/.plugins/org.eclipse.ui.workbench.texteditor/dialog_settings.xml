@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="HAL_GPIO_EXTI_Callback"/>
+		<item key="selection" value="packet"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="packet"/>
+			<item value="sourceAddress"/>
+			<item value="xIrqStatus"/>
+			<item value="clear"/>
+			<item value="MY_ADDRESS"/>
+			<item value="HAL_UART_Transmit"/>
 			<item value="HAL_GPIO_EXTI_Callback"/>
 			<item value="StackNMaxReTx"/>
 			<item value="piggy"/>
@@ -17,12 +23,6 @@
 			<item value="port"/>
 			<item value="drawBar"/>
 			<item value="test_init_pinA5onboardLED"/>
-			<item value="maxFreq"/>
-			<item value="Task1"/>
-			<item value="portC"/>
-			<item value="scanning"/>
-			<item value="BIN"/>
-			<item value="EDGE"/>
 		</list>
 		<list key="replacehistory">
 			<item value="Task_FFT"/>
@@ -41,8 +41,8 @@
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="-55"/>
-		<item key="DIALOG_Y_ORIGIN" value="721"/>
+		<item key="DIALOG_X_ORIGIN" value="1220"/>
+		<item key="DIALOG_Y_ORIGIN" value="373"/>
 		<item key="DIALOG_WIDTH" value="414"/>
 		<item key="DIALOG_HEIGHT" value="493"/>
 		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>

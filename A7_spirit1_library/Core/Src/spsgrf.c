@@ -146,7 +146,7 @@ void SPSGRF_Init(void)
 
   // Configure the RX timeout
 #ifdef RECEIVE_TIMEOUT
-  SpiritTimerSetRxTimeoutMs(2000.0);
+  SpiritTimerSetRxTimeoutMs(RECEIVE_TIMEOUT);
 #else
   SET_INFINITE_RX_TIMEOUT();
 #endif /* RECIEVE_TIMEOUT */
