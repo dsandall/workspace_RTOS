@@ -64,6 +64,7 @@ typedef struct User{
 
 
 char myUsername[] = "kwiksckoped";
+TickType_t startTime;
 
 struct User usersOnline[256];
 
@@ -126,15 +127,7 @@ void myHAL_UART_clear(){
 
 }
 
-void printUsersOnline(){
-	TickType_t currentTime = xTaskGetTickCount;
-	myHAL_UART_printf("Users Online:\r\n");
-	for (int i = 0; i < 256; i++){
-		if (usersOnline[i].address != 0){
-			myHAL_UART_printf("%d seen %d s ago\r\n", usersOnline[i].address, (currentTime - usersOnline[i].timeLastSeen)/1000);
-		}
-	}
-}
+
 
 
 
@@ -152,10 +145,12 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   if (GPIO_Pin != SPIRIT1_GPIO3_Pin){return;}
 
   SpiritIrqGetStatus(&xIrqStatus);
+//	myHAL_UART_printf("int\r\n");
 
 
   if (xIrqStatus.IRQ_TX_DATA_SENT)
   {
+//		myHAL_UART_printf("data sent\r\n");
 	  confirm_TX();
 	  xSemaphoreGiveFromISR(FLAG_SPIRIT, &xHigherPriorityTaskWoken);
   }
@@ -163,18 +158,23 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   if (xIrqStatus.IRQ_RX_DATA_READY)
   {
 //    xRxDoneFlag = S_SET;
+	  myHAL_UART_printf("data received\r\n");
+
 	  get_RX();
 	  xSemaphoreGiveFromISR(FLAG_SPIRIT, &xHigherPriorityTaskWoken);
   }
 
   if (xIrqStatus.IRQ_RX_DATA_DISC)
   {
-    SpiritCmdStrobeRx();
+	myHAL_UART_printf("  | || || |_\r\n");
+//	get_RX();
+//    SpiritCmdStrobeRx();
   }
 
   if (xIrqStatus.IRQ_RX_TIMEOUT){
-	xSemaphoreGiveFromISR(FLAG_SPIRIT, &xHigherPriorityTaskWoken);
-	SpiritCmdStrobeRx();
+	myHAL_UART_printf("timeout\r\n");
+//	xSemaphoreGiveFromISR(FLAG_SPIRIT, &xHigherPriorityTaskWoken);
+//	SpiritCmdStrobeRx();
   }
 
   SpiritIrqClearStatus();
@@ -182,91 +182,161 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 }
 
 
-void receive(){
-	  char payload[] = "Hello World!\r\n";
-	  uint8_t rxLen;
-
-//	  char clear[] = "\x1B[2J\x1B[0m"; // clear
+//void receive(){
+//	  char RXpayload[] = "Hello World!\r\n";
+//	  uint8_t rxLen;
 //
-//		HAL_UART_Transmit(&huart2, clear, 9, 100);
-	//	HAL_UART_Transmit(&huart2, payload, 20, 100);
+////	  char clear[] = "\x1B[2J\x1B[0m"; // clear
+////
+////		HAL_UART_Transmit(&huart2, clear, 9, 100);
+//	//	HAL_UART_Transmit(&huart2, RXpayload, 20, 100);
+//
+//	  xRxDoneFlag = S_RESET;
+//	  SPSGRF_StartRx();
+//
+//
+//	  while (!xRxDoneFlag);
+//
+//
+//	  uint8_t sadd;
+//	  sadd = SpiritPktStackGetReceivedSourceAddress();
+//
+//	  usersOnline[sadd].timeLastSeen = xTaskGetTickCount();
+//	  usersOnline[sadd].address = sadd;
+//
+//	  rxLen = SPSGRF_GetRxData(&RXpayload);
+//
+////	  myHAL_UART_clear();
+//	  HAL_UART_Transmit(&huart2, "Received: ", 10, HAL_MAX_DELAY);
+//	  HAL_UART_Transmit(&huart2, RXpayload, rxLen, HAL_MAX_DELAY);
+//}
+//
+//
+//void transmit(){
+//	char TXpayload[] = "Beep beep bloop bloop\r\n";
+//
+//	// Send the payload
+//    xTxDoneFlag = S_RESET;
+//    SPSGRF_StartTx(TXpayload, strlen(TXpayload));
+//    while(!xTxDoneFlag);
+//
+//    myHAL_UART_clear();
+//    myHAL_UART_printf("payload sent: %s", TXpayload);
+//}
 
-	  xRxDoneFlag = S_RESET;
-	  SPSGRF_StartRx();
 
+void SpiritGotoReadyState(void) {
+  static unsigned int i;
+  /* Wait for the radio to enter the ready state */
+  do {
+    /* Go to the ready state */
+    if (g_xStatus.MC_STATE == MC_STATE_LOCK) {
+      SpiritCmdStrobeReady();
+    } else {
+      SpiritCmdStrobeSabort();
+    }
+    /* Delay for state transition */
+    for (i = 0; i != 0xFF; i++)
+      ;
+    /* Update the global status register variable */
+    SpiritRefreshStatus();
+  } while (g_xStatus.MC_STATE != MC_STATE_READY);
 
-	  while (!xRxDoneFlag);
-
-
-	  uint8_t sadd;
-	  sadd = SpiritPktStackGetReceivedSourceAddress();
-
-	  usersOnline[sadd].timeLastSeen = xTaskGetTickCount();
-	  usersOnline[sadd].address = sadd;
-
-	  rxLen = SPSGRF_GetRxData(&payload);
-
-	  myHAL_UART_clear();
-	  HAL_UART_Transmit(&huart2, "Received: ", 10, HAL_MAX_DELAY);
-	  HAL_UART_Transmit(&huart2, payload, rxLen, HAL_MAX_DELAY);
+  xSemaphoreGive(FLAG_SPIRIT);
 }
-
-
-void transmit(){
-	char payload[] = "Beep beep bloop bloop\r\n";
-
-	// Send the payload
-    xTxDoneFlag = S_RESET;
-    SPSGRF_StartTx(payload, strlen(payload));
-    while(!xTxDoneFlag);
-
-    myHAL_UART_clear();
-    myHAL_UART_printf("payload sent: %s", payload);
-}
-
-
-
 
 //TX//////////////
-char payload[] = "Beep beep bloop bloop\r\n";
+char TXpayload[] = " Beep beep bloop bloop\r\n";
 
 void confirm_TX(){
-    myHAL_UART_clear();
-    myHAL_UART_printf("payload sent: %s", payload);
+//    myHAL_UART_clear();
+    myHAL_UART_printf("payload sent: %s", TXpayload);
 }
+
 
 void Task_TX(void *argument){
 	  while (1)
 	  {
+
+		  SpiritGotoReadyState();
+
 		  if(xSemaphoreTake(FLAG_SPIRIT, 10) == 1){
-			SPSGRF_StartTx(payload, strlen(payload));
-			vTaskDelay(2000);
+			TXpayload[0] = 0x3; //set heartbeat type
+			SPSGRF_StartTx(TXpayload, strlen(TXpayload));
 		  }
+
+		  vTaskDelay(5000);
+
 	  }
 }
 
 
 //USERS//////////////
+
+void printUsersOnline(){
+	TickType_t currentTime = xTaskGetTickCount();
+	myHAL_UART_printf("--- Users Online @t=%d:\r\n", (currentTime-startTime)/1000);
+	for (int i = 0; i < 256; i++){
+		if (usersOnline[i].address != 0){
+			myHAL_UART_printf("- 0x%x(%d) seen %d s ago\r\n", usersOnline[i].address, usersOnline[i].address, (currentTime - usersOnline[i].timeLastSeen)/1000);
+		}
+	}
+}
+
+void reapUsers(){
+	TickType_t currentTime = xTaskGetTickCount();
+	for (int i = 0; i < 256; i++){
+		if ((usersOnline[i].address != 0)){
+			if((currentTime-usersOnline[i].timeLastSeen)/1000 > 30){
+				myHAL_UART_printf("reaping user 0x%x\r\n", usersOnline[i].address);
+				usersOnline[i].address = 0;
+				usersOnline[i].timeLastSeen = 0;
+//				usersOnline[i].username = 0;
+
+			}
+
+		}
+	}
+}
+
 void Task_printUsers(void *argument){
 	while (1){
+	  reapUsers();
 	  printUsersOnline();
-	  vTaskDelay(1000);
-
+	  vTaskDelay(3500);
 	}
 }
 
 //RX//////////////
 void get_RX(){
 	uint8_t sadd = SpiritPktStackGetReceivedSourceAddress();
+	uint8_t RXpayload[100];
+	RXpayload[0] = 0;
+	RXpayload[1] = 0;
+	RXpayload[2] = 0;
+	RXpayload[3] = 0;
+	RXpayload[4] = 0;
+	RXpayload[5] = 0;
 
 	usersOnline[sadd].timeLastSeen = xTaskGetTickCount();
 	usersOnline[sadd].address = sadd;
 
-	int rxLen = SPSGRF_GetRxData(&payload);
+	int rxLen = SPSGRF_GetRxData(&RXpayload);
+	RXpayload[rxLen+1] = '\0';
 
-	myHAL_UART_clear();
+//	myHAL_UART_clear();
 	HAL_UART_Transmit(&huart2, "Received: ", 10, HAL_MAX_DELAY);
-	HAL_UART_Transmit(&huart2, payload, rxLen, HAL_MAX_DELAY);
+//	HAL_UART_Transmit(&huart2, RXpayload, rxLen+1, HAL_MAX_DELAY);
+	myHAL_UART_printf("%02X:%02X:%02X:%02X from 0x%x", RXpayload[0], RXpayload[1], RXpayload[2], RXpayload[3], sadd);
+
+	HAL_UART_Transmit(&huart2, "\r\n", 2, HAL_MAX_DELAY);
+
+}
+
+void printPacket(uint8_t * packet){
+	//byte 0 - heart beat
+	//byte 1-21 - another
+	//byte 22-272 - another one
 }
 
 void Task_RX(void *argument){
@@ -338,12 +408,14 @@ int main(void)
 
 
   /* USER CODE BEGIN 2 */
+  startTime = xTaskGetTickCount();
+
   myHAL_UART_clear();
   myHAL_UART_printf("let's goooo");
 
   SPSGRF_Init();
 
-  SpiritPktBasicSetDestinationAddress(0xFF);
+  SpiritPktStackSetDestinationAddress(0xFF);
 
 
 

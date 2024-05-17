@@ -171,7 +171,7 @@ void SPSGRF_StartTx(uint8_t *txBuff, uint8_t txLen)
 
   // start TX operation
   SpiritSpiWriteLinearFifo(txLen, txBuff);
-  SpiritPktBasicSetPayloadLength(txLen);
+  SpiritPktStackSetPayloadLength(txLen);
   SpiritCmdStrobeTx();
 }
 
